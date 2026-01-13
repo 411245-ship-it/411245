@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的英文單字測驗</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f7f6; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        h2 { color: #333; }
+        .word { font-size: 2.5rem; font-weight: bold; margin: 1rem 0; color: #2d89ef; }
+        input { width: 80%; padding: 10px; margin-bottom: 1rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        button { background: #2d89ef; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #1b6ec2; }
+        #feedback { margin-top: 1rem; font-weight: bold; height: 1.2rem; }
+        .score { margin-top: 2rem; font-size: 0.9rem; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>單字測驗</h2>
+    <div id="quiz-area">
+        <div class="word" id="current-word">Loading...</div>
+        <input type="text" id="user-input" placeholder="輸入中文意思" autocomplete="off">
+        <br>
+        <button onclick="checkAnswer()">提交答案</button>
+        <div id="feedback"></div>
+    </div>
+    <div class="score">
+        答對題數：<span id="correct-count">0</span> / <span id="total-count">0</span>
+    </div>
+</div>
+
+<script>
+    // 1. 單字資料庫
+    const wordBank = [
+        { en: "apple", zh: "蘋果" },
+        { en: "banana", zh: "香蕉" },
+        { en: "challenge", zh: "挑戰" },
+        { en: "opportunity", zh: "機會" },
+        { en: "persistent", zh: "堅持不懈的" }
+    ];
+
+    let currentIndex = 0;
+    let correctScore = 0;
+    let totalAttempted = 0;
+
+    // 2. 初始化：打亂單字順序
+    function shuffleWords() {
+        wordBank.sort(() => Math.random() - 0.5);
+    }
+
+    function showNextWord() {
+        if (currentIndex < wordBank.length) {
+            document.getElementById('current-word').innerText = wordBank[currentIndex].en;
+            document.getElementById('user-input').value = "";
+            document.getElementById('feedback').innerText = "";
+        } else {
+            document.getElementById('quiz-area').innerHTML = "<h3>測驗結束！</h3><button onclick='location.reload()'>重新開始</button>";
+        }
+    }
+
+    // 3. 檢查答案
+    function checkAnswer() {
+        const userInput = document.getElementById('user-input').value.trim();
+        const correctAnswer = wordBank[currentIndex].zh;
+        const feedbackEl = document.getElementById('feedback');
+
+        totalAttempted++;
+        
+        if (userInput === correctAnswer) {
+            feedbackEl.innerText = "✅ 正確！";
+            feedbackEl.style.color = "green";
+            correctScore++;
+        } else {
+            feedbackEl.innerText = `❌ 錯誤，答案是：${correctAnswer}`;
+            feedbackEl.style.color = "red";
+        }
+
+        document.getElementById('correct-count').innerText = correctScore;
+        document.getElementById('total-count').innerText = totalAttempted;
+
+        currentIndex++;
+        // 延遲一秒後顯示下一題，讓使用者看清楚回饋
+        setTimeout(showNextWord, 1200);
+    }
+
+    // 監聽 Enter 鍵
+    document.getElementById('user-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    shuffleWords();
+    showNextWord();
+</script>
+
+</body>
+</html>
